@@ -1,0 +1,16 @@
+{
+  "name": "accuser",
+  "version": "1.0.0",
+  "description": "A Github Pull Request bot for assigning people to pull requests",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sam Yong",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.4.1",
+    "config": "^1.21.0",
+    "github": "^2.5.1"
+  }
+}
