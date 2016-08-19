@@ -10,7 +10,6 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.4.1",
-    "config": "^1.21.0",
     "github": "^2.5.1"
   }
 }
