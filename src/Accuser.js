@@ -26,12 +26,6 @@ Accuser.prototype.watch = function(user, repository) {
 
 Accuser.prototype.accuse = function(pr, usernames) {
   var self = this;
-  console.log({
-    user: pr.base.repo.owner.login,
-    repo: pr.base.repo.name,
-    number: pr.number,
-    assignees: usernames
-  });
   self.github.issues.addAssigneesToIssue({
     user: pr.base.repo.owner.login,
     repo: pr.base.repo.name,
