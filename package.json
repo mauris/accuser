@@ -1,6 +1,6 @@
 {
   "name": "accuser",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A Github Pull Request bot for assigning people to pull requests",
   "main": "index.js",
   "scripts": {
