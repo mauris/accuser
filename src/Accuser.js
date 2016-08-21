@@ -79,7 +79,7 @@ Accuser.prototype.run = function() {
   };
 
   var tick = function() {
-    this.repos.forEach(function(val) {
+    self.repos.forEach(function(val) {
       var user = val[0];
       var repo = val[1];
 
