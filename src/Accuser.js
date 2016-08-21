@@ -1,5 +1,7 @@
 /*
-  Accuser - Github wrapper for pull request automation..
+  Accuser - Github wrapper for pull request automation.
+  Written by Sam-Mauris Yong
+  Code licensed under MIT License.
  */
 
 var GitHubApi = require("github");
@@ -100,7 +102,7 @@ Accuser.prototype.run = function() {
     });
   };
 
-  setTimeout(tick, self.interval);
+  tick();
 }
 
 module.exports = Accuser;
