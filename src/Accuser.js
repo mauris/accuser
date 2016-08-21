@@ -36,6 +36,16 @@ Accuser.prototype.accuse = function(pr, usernames) {
   });
 };
 
+Accuser.prototype.comment = function(pr, comment) {
+  var self = this;
+  self.github.issues.createComment({
+    user: pr.base.repo.owner.login,
+    repo: pr.base.repo.name,
+    number: pr.number,
+    body: comment
+  });
+};
+
 Accuser.prototype.addWorker = function() {
   var self = this;
   var worker = {
