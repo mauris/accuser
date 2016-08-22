@@ -6,6 +6,7 @@
 
 var GitHubApi = require("github");
 var Promise = require('bluebird');
+var Repository = require("./Repository");
 
 var Accuser = function (options) {
   options = options || {};
@@ -42,29 +43,7 @@ Accuser.prototype.comment = function(pr, comment) {
 
 Accuser.prototype.addRepository = function(user, repo) {
   var self = this;
-  var repository = {
-    'user': user,
-    'repo': repo,
-    'workers': [],
-    "newWorker": function() {
-      var worker = {
-        'filters': [],
-        'do': []
-      };
-      repository.workers.push(worker);
-      var workerChainer = {
-        "filter": function(filterCallback) {
-          worker.filters.push(filterCallback);
-          return workerChainer;
-        },
-        "do": function(doCallback) {
-          worker.do.push(doCallback);
-          return workerChainer;
-        }
-      };
-      return workerChainer;
-    }
-  };
+  var repository = new Repository(user, repo);
   self.repos.push(repository);
   return repository;
 };
