@@ -20,12 +20,6 @@ Accuser.prototype.authenticate = function(config) {
   return this.github.authenticate(config);
 };
 
-Accuser.prototype.watch = function(user, repository) {
-  var self = this;
-  this.repos.push([user, repository]);
-  return self;
-}
-
 Accuser.prototype.accuse = function(pr, usernames) {
   var self = this;
   self.github.issues.addAssigneesToIssue({
@@ -46,24 +40,33 @@ Accuser.prototype.comment = function(pr, comment) {
   });
 };
 
-Accuser.prototype.addWorker = function() {
+Accuser.prototype.addRepository = function(user, repo) {
   var self = this;
-  var worker = {
-    'filters': [],
-    'do': []
-  };
-  this.workers.push(worker);
-  var workerChainer = {
-    "filter": function(filterCallback) {
-      worker.filters.push(filterCallback);
-      return workerChainer;
-    },
-    "do": function(doCallback) {
-      worker.do.push(doCallback);
+  var repository = {
+    'user': user,
+    'repo': repo,
+    'workers': [],
+    "newWorker": function() {
+      var worker = {
+        'filters': [],
+        'do': []
+      };
+      repository.workers.push(worker);
+      var workerChainer = {
+        "filter": function(filterCallback) {
+          worker.filters.push(filterCallback);
+          return workerChainer;
+        },
+        "do": function(doCallback) {
+          worker.do.push(doCallback);
+          return workerChainer;
+        }
+      };
       return workerChainer;
     }
   };
-  return workerChainer;
+  self.repos.push(repository);
+  return repository;
 };
 
 Accuser.prototype.run = function() {
