@@ -27,6 +27,7 @@
     "github": "^2.5.1"
   },
   "devDependencies": {
-    "mocha": "^3.0.2"
+    "mocha": "^3.0.2",
+    "sinon": "^1.17.5"
   }
 }
