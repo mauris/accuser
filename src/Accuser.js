@@ -100,10 +100,10 @@ Accuser.prototype.run = function() {
       .all(promises)
       .then(function(){
         setTimeout(tick, self.interval);
-      }
+      });
   };
 
   tick();
-}
+};
 
 module.exports = Accuser;
