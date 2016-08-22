@@ -65,7 +65,7 @@ var runWorkers = function(repository, prList) {
   });
 };
 
-var createResponseCallback = function(resolve, repository) {
+var createResponseCallback = function(github, resolve, repository) {
   return function(result) {
     runWorkers(repository, result);
     if (github.hasNextPage(result)) {
@@ -77,33 +77,41 @@ var createResponseCallback = function(resolve, repository) {
   };
 };
 
+Accuser.prototype.tick = function() {
+  var self = this;
+  var promises = [];
+  self.repos.forEach(function(repository) {
+    var repoPromise = new Promise(function(resolve, reject){
+      self.github.pullRequests
+        .getAll({
+          'user': repository.user,
+          'repo': repository.repo,
+          'state': 'open'
+        })
+        .then(createResponseCallback(self.github, resolve, repository));
+    });
+    promises.push(repoPromise);
+  });
+
+  return Promise
+    .all(promises);
+};
+
 Accuser.prototype.run = function() {
   var self = this;
   var github = self.github;
 
-  var tick = function() {
-    var promises = [];
-    self.repos.forEach(function(repository) {
-      var repoPromise = new Promise(function(resolve, reject){
-        self.github.pullRequests
-          .getAll({
-            'user': repository.user,
-            'repo': repository.repo,
-            'state': 'open'
-          })
-          .then(createResponseCallback(resolve, repository));
-      });
-      promises.push(repoPromise);
-    });
-
-    Promise
-      .all(promises)
-      .then(function(){
-        setTimeout(tick, self.interval);
+  var tickInterval = function() {
+    self.tick()
+      .then(function() {
+        setTimeout(tickInterval, self.interval);
       });
   };
 
-  tick();
+  self.tick()
+    .then(function() {
+      setTimeout(tickInterval, self.interval);
+    });
 };
 
 module.exports = Accuser;
