@@ -69,7 +69,8 @@ var createResponseCallback = function(github, resolve, repository) {
   return function(result) {
     runWorkers(repository, result);
     if (github.hasNextPage(result)) {
-      github.getNextPage(result, processResponse);
+      github.getNextPage(result)
+        .then(createResponseCallback(github, resolve, repository));
     } else {
       // done with all paginations
       resolve();
