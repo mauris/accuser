@@ -82,17 +82,20 @@ var createResponseCallback = function(github, resolve, repository) {
   };
 };
 
-Accuser.prototype.tick = function() {
+Accuser.prototype.tick = function(filters) {
   var self = this;
   var promises = [];
+
+  filters = filters || {};
+  filters.state = filters.state || 'open';
+  filters.assignee = filters.assignee || '*';
+
   self.repos.forEach(function(repository) {
     var repoPromise = new Promise(function(resolve, reject){
-      self.github.pullRequests
-        .getAll({
-          'user': repository.user,
-          'repo': repository.repo,
-          'state': 'open'
-        })
+      filters.user = repository.user;
+      filters.repo = repository.repo;
+      self.github.issues
+        .getForRepo(filters)
         .then(createResponseCallback(self.github, resolve, repository));
     });
     promises.push(repoPromise);
@@ -102,18 +105,20 @@ Accuser.prototype.tick = function() {
     .all(promises);
 };
 
-Accuser.prototype.run = function() {
+Accuser.prototype.run = function(filters) {
   var self = this;
   var github = self.github;
 
+  filters = filters || {};
+
   var tickInterval = function() {
-    self.tick()
+    self.tick(filters)
       .then(function() {
         setTimeout(tickInterval, self.interval);
       });
   };
 
-  self.tick()
+  self.tick(filters)
     .then(function() {
       setTimeout(tickInterval, self.interval);
     });
