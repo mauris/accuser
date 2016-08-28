@@ -46,7 +46,7 @@ describe("Accuser", function() {
     next();
   });
 
-  it("should accuse someone based on a pull request object and username", function(next) {
+  it("should accuse someone based on an issue object and username", function(next) {
     var repository = accuser.addRepository("mauris", "accuser");
 
     accuser.github = {
@@ -66,7 +66,7 @@ describe("Accuser", function() {
     next();
   });
 
-  it("should accuse someone based on a pull request object and multiple username", function(next) {
+  it("should accuse someone based on an issue object and multiple username", function(next) {
     var repository = accuser.addRepository("mauris", "accuser");
 
     accuser.github = {
@@ -87,7 +87,7 @@ describe("Accuser", function() {
     next();
   });
 
-  it("should add a comment to a pull request", function(next) {
+  it("should add a comment to an issue", function(next) {
     var repository = accuser.addRepository("mauris", "accuser");
 
     accuser.github = {
@@ -108,6 +108,7 @@ describe("Accuser", function() {
   });
 
   it("should fetch pull requests from an added repository", function(next) {
+  it("should fetch issues from an added repository", function(next) {
     var repository = accuser.addRepository("mauris", "accuser");
 
     var filterSpy = sinon.spy();
