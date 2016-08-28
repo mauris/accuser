@@ -5,7 +5,8 @@ var Accuser = require('../');
 
 describe("Accuser", function() {
   var accuser;
-  var samplePR = {
+
+  var sampleIssue = {
     number: 20,
     base: {
       repo: {
@@ -46,37 +47,41 @@ describe("Accuser", function() {
   });
 
   it("should accuse someone based on a pull request object and username", function(next) {
+    var repository = accuser.addRepository("mauris", "accuser");
+
     accuser.github = {
       issues: {
         addAssigneesToIssue: function(obj) {
-          assert(obj.repo === samplePR.base.repo.name);
-          assert(obj.user === samplePR.base.repo.owner.login);
-          assert(obj.number === samplePR.number);
+          assert(obj.repo === repository.repo);
+          assert(obj.user === repository.user);
+          assert(obj.number === sampleIssue.number);
           assert(obj.assignees[0] === "mauris");
         }
       }
     };
     var mock = sinon.mock(accuser.github.issues);
     mock.expects("addAssigneesToIssue").once();
-    accuser.accuse(samplePR, ["mauris"]);
+    accuser.accuse(repository, sampleIssue, ["mauris"]);
     mock.verify();
     next();
   });
 
   it("should add a comment to a pull request", function(next) {
+    var repository = accuser.addRepository("mauris", "accuser");
+
     accuser.github = {
       issues: {
         createComment: function(obj) {
-          assert(obj.repo === samplePR.base.repo.name);
-          assert(obj.user === samplePR.base.repo.owner.login);
-          assert(obj.number === samplePR.number);
+          assert(obj.repo === repository.repo);
+          assert(obj.user === repository.user);
+          assert(obj.number === sampleIssue.number);
           assert(obj.body === "some comment");
         }
       }
     };
     var mock = sinon.mock(accuser.github.issues);
     mock.expects("createComment").once();
-    accuser.comment(samplePR, "some comment");
+    accuser.comment(repository, sampleIssue, "some comment");
     mock.verify();
     next();
   });
@@ -87,7 +92,7 @@ describe("Accuser", function() {
     var filterSpy = sinon.spy();
     var workerFilter = function(repo, pr) {
       assert(repository === repo);
-      assert(pr == samplePR);
+      assert(pr == sampleIssue);
       filterSpy();
       return true;
     };
@@ -95,7 +100,7 @@ describe("Accuser", function() {
     var doSpy = sinon.spy();
     var workerDo = function(repo, pr) {
       assert(repository === repo);
-      assert(pr == samplePR);
+      assert(pr == sampleIssue);
       doSpy();
     };
 
@@ -104,10 +109,10 @@ describe("Accuser", function() {
       .do(workerDo);
 
     accuser.github = {
-      pullRequests: {
-        getAll: function(obj) {
+      issues: {
+        getForRepo: function(obj) {
           return new Promise(function(resolve, reject){
-            resolve([samplePR]);
+            resolve([sampleIssue]);
           })
         }
       },
@@ -115,9 +120,9 @@ describe("Accuser", function() {
         return false
       }
     };
-    var mock = sinon.mock(accuser.github.pullRequests);
-    mock.expects("getAll").once().returns(new Promise(function(resolve, reject){
-      resolve([samplePR]);
+    var mock = sinon.mock(accuser.github.issues);
+    mock.expects("getForRepo").once().returns(new Promise(function(resolve, reject){
+      resolve([sampleIssue]);
     }));
 
     accuser.tick()
