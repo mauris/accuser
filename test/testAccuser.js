@@ -107,7 +107,49 @@ describe("Accuser", function() {
     next();
   });
 
-  it("should fetch pull requests from an added repository", function(next) {
+  it("should add a label to an issue", function(next) {
+    var repository = accuser.addRepository("mauris", "accuser");
+    var testLabel = "testingonly";
+    accuser.github = {
+      issues: {
+        addLabels: function(obj) {
+          assert(obj.repo === repository.repo);
+          assert(obj.user === repository.user);
+          assert(obj.number === sampleIssue.number);
+          assert(obj.body[0] === testLabel);
+        }
+      }
+    };
+    var mock = sinon.mock(accuser.github.issues);
+    mock.expects("addLabels").once();
+    accuser.addLabels(repository, sampleIssue, testLabel);
+    mock.verify();
+    next();
+  });
+
+  it("should add some labels to an issue", function(next) {
+    var repository = accuser.addRepository("mauris", "accuser");
+    var testLabel = [
+      "testingonly",
+      "noway"
+    ];
+    accuser.github = {
+      issues: {
+        addLabels: function(obj) {
+          assert(obj.repo === repository.repo);
+          assert(obj.user === repository.user);
+          assert(obj.number === sampleIssue.number);
+          assert(obj.body === testLabel);
+        }
+      }
+    };
+    var mock = sinon.mock(accuser.github.issues);
+    mock.expects("addLabels").once();
+    accuser.addLabels(repository, sampleIssue, testLabel);
+    mock.verify();
+    next();
+  });
+
   it("should fetch issues from an added repository", function(next) {
     var repository = accuser.addRepository("mauris", "accuser");
 
