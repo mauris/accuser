@@ -150,6 +150,26 @@ describe("Accuser", function() {
     next();
   });
 
+  it("should remove a label from an issue", function(next) {
+    var repository = accuser.addRepository("mauris", "accuser");
+    var testLabel = "noway";
+    accuser.github = {
+      issues: {
+        removeLabel: function(obj) {
+          assert(obj.repo === repository.repo);
+          assert(obj.user === repository.user);
+          assert(obj.number === sampleIssue.number);
+          assert(obj.body === testLabel);
+        }
+      }
+    };
+    var mock = sinon.mock(accuser.github.issues);
+    mock.expects("removeLabel").once();
+    accuser.removeLabel(repository, sampleIssue, testLabel);
+    mock.verify();
+    next();
+  });
+
   it("should fetch issues from an added repository", function(next) {
     var repository = accuser.addRepository("mauris", "accuser");
 
