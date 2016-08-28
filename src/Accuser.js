@@ -41,6 +41,26 @@ Accuser.prototype.comment = function(repository, issue, comment) {
   });
 };
 
+Accuser.prototype.addLabels = function(repository, issue, labels) {
+  var self = this;
+  self.github.issues.addLabels({
+    user: repository.user,
+    repo: repository.repo,
+    number: issue.number,
+    body: labels.constructor == Array ? labels : [labels]
+  });
+};
+
+Accuser.prototype.removeLabel = function(repository, issue, label) {
+  var self = this;
+  self.github.issues.removeLabel({
+    user: repository.user,
+    repo: repository.repo,
+    number: issue.number,
+    name: label
+  });
+};
+
 Accuser.prototype.addRepository = function(user, repo) {
   var self = this;
   var repository = new Repository(user, repo);
