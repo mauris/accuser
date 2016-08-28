@@ -1,5 +1,5 @@
 /*
-  Accuser - Github wrapper for pull request automation.
+  Accuser - Github wrapper for issue and pull request automation.
   Written by Sam-Mauris Yong
   Code licensed under MIT License.
  */
