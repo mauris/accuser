@@ -61,7 +61,28 @@ describe("Accuser", function() {
     };
     var mock = sinon.mock(accuser.github.issues);
     mock.expects("addAssigneesToIssue").once();
-    accuser.accuse(repository, sampleIssue, ["mauris"]);
+    accuser.accuse(repository, sampleIssue, "mauris");
+    mock.verify();
+    next();
+  });
+
+  it("should accuse someone based on a pull request object and multiple username", function(next) {
+    var repository = accuser.addRepository("mauris", "accuser");
+
+    accuser.github = {
+      issues: {
+        addAssigneesToIssue: function(obj) {
+          assert(obj.repo === repository.repo);
+          assert(obj.user === repository.user);
+          assert(obj.number === sampleIssue.number);
+          assert(obj.assignees[0] === "mauris");
+          assert(obj.assignees[1] === "octocat");
+        }
+      }
+    };
+    var mock = sinon.mock(accuser.github.issues);
+    mock.expects("addAssigneesToIssue").once();
+    accuser.accuse(repository, sampleIssue, ["mauris", "octocat"]);
     mock.verify();
     next();
   });
