@@ -1,5 +1,5 @@
 /*
-  Accuser - Github wrapper for pull request automation.
+  Accuser - Github wrapper for issue and pull request automation.
   Written by Sam-Mauris Yong
   Code licensed under MIT License.
  */
@@ -21,23 +21,43 @@ Accuser.prototype.authenticate = function(config) {
   return this.github.authenticate(config);
 };
 
-Accuser.prototype.accuse = function(pr, usernames) {
+Accuser.prototype.accuse = function(repository, issue, usernames) {
   var self = this;
   self.github.issues.addAssigneesToIssue({
-    user: pr.base.repo.owner.login,
-    repo: pr.base.repo.name,
-    number: pr.number,
-    assignees: usernames
+    user: repository.user,
+    repo: repository.repo,
+    number: issue.number,
+    assignees: usernames.constructor == Array ? usernames : [usernames]
   });
 };
 
-Accuser.prototype.comment = function(pr, comment) {
+Accuser.prototype.comment = function(repository, issue, comment) {
   var self = this;
   self.github.issues.createComment({
-    user: pr.base.repo.owner.login,
-    repo: pr.base.repo.name,
-    number: pr.number,
+    user: repository.user,
+    repo: repository.repo,
+    number: issue.number,
     body: comment
+  });
+};
+
+Accuser.prototype.addLabels = function(repository, issue, labels) {
+  var self = this;
+  self.github.issues.addLabels({
+    user: repository.user,
+    repo: repository.repo,
+    number: issue.number,
+    body: labels.constructor == Array ? labels : [labels]
+  });
+};
+
+Accuser.prototype.removeLabel = function(repository, issue, label) {
+  var self = this;
+  self.github.issues.removeLabel({
+    user: repository.user,
+    repo: repository.repo,
+    number: issue.number,
+    name: label
   });
 };
 
@@ -69,8 +89,12 @@ var createResponseCallback = function(github, resolve, repository) {
   return function(result) {
     runWorkers(repository, result);
     if (github.hasNextPage(result)) {
-      github.getNextPage(result)
-        .then(createResponseCallback(github, resolve, repository));
+      github.getNextPage(result, function(err, res){
+        var callback = createResponseCallback(github, resolve, repository);
+        if (err === null) {
+          callback(res);
+        }
+      });
     } else {
       // done with all paginations
       resolve();
@@ -78,17 +102,20 @@ var createResponseCallback = function(github, resolve, repository) {
   };
 };
 
-Accuser.prototype.tick = function() {
+Accuser.prototype.tick = function(filters) {
   var self = this;
   var promises = [];
+
+  filters = filters || {};
+  filters.state = filters.state || 'open';
+  filters.assignee = filters.assignee || '*';
+
   self.repos.forEach(function(repository) {
     var repoPromise = new Promise(function(resolve, reject){
-      self.github.pullRequests
-        .getAll({
-          'user': repository.user,
-          'repo': repository.repo,
-          'state': 'open'
-        })
+      filters.user = repository.user;
+      filters.repo = repository.repo;
+      self.github.issues
+        .getForRepo(filters)
         .then(createResponseCallback(self.github, resolve, repository));
     });
     promises.push(repoPromise);
@@ -98,18 +125,20 @@ Accuser.prototype.tick = function() {
     .all(promises);
 };
 
-Accuser.prototype.run = function() {
+Accuser.prototype.run = function(filters) {
   var self = this;
   var github = self.github;
 
+  filters = filters || {};
+
   var tickInterval = function() {
-    self.tick()
+    self.tick(filters)
       .then(function() {
         setTimeout(tickInterval, self.interval);
       });
   };
 
-  self.tick()
+  self.tick(filters)
     .then(function() {
       setTimeout(tickInterval, self.interval);
     });
