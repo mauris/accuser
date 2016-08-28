@@ -27,7 +27,7 @@ Accuser.prototype.accuse = function(repository, issue, usernames) {
     user: repository.user,
     repo: repository.repo,
     number: issue.number,
-    assignees: usernames
+    assignees: usernames.constructor == Array ? usernames : [usernames]
   });
 };
 
