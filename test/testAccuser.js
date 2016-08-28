@@ -154,17 +154,17 @@ describe("Accuser", function() {
     var repository = accuser.addRepository("mauris", "accuser");
 
     var filterSpy = sinon.spy();
-    var workerFilter = function(repo, pr) {
+    var workerFilter = function(repo, issue) {
       assert(repository === repo);
-      assert(pr == sampleIssue);
+      assert(issue == sampleIssue);
       filterSpy();
       return true;
     };
 
     var doSpy = sinon.spy();
-    var workerDo = function(repo, pr) {
+    var workerDo = function(repo, issue) {
       assert(repository === repo);
-      assert(pr == sampleIssue);
+      assert(issue == sampleIssue);
       doSpy();
     };
 
