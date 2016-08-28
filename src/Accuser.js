@@ -21,22 +21,22 @@ Accuser.prototype.authenticate = function(config) {
   return this.github.authenticate(config);
 };
 
-Accuser.prototype.accuse = function(pr, usernames) {
+Accuser.prototype.accuse = function(repository, issue, usernames) {
   var self = this;
   self.github.issues.addAssigneesToIssue({
-    user: pr.base.repo.owner.login,
-    repo: pr.base.repo.name,
-    number: pr.number,
+    user: repository.user,
+    repo: repository.repo,
+    number: issue.number,
     assignees: usernames
   });
 };
 
-Accuser.prototype.comment = function(pr, comment) {
+Accuser.prototype.comment = function(repository, issue, comment) {
   var self = this;
   self.github.issues.createComment({
-    user: pr.base.repo.owner.login,
-    repo: pr.base.repo.name,
-    number: pr.number,
+    user: repository.user,
+    repo: repository.repo,
+    number: issue.number,
     body: comment
   });
 };
