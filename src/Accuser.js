@@ -77,7 +77,7 @@ Accuser.prototype.close = function(repository, issue) {
     user: repository.user,
     repo: repository.repo,
     number: issue.number,
-    state: 'close'
+    state: 'closed'
   });
 };
 
