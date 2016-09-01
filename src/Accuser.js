@@ -61,6 +61,26 @@ Accuser.prototype.removeLabel = function(repository, issue, label) {
   });
 };
 
+Accuser.prototype.open = function(repository, issue) {
+  var self = this;
+  self.github.issues.edit({
+    user: repository.user,
+    repo: repository.repo,
+    number: issue.number,
+    state: 'open'
+  });
+};
+
+Accuser.prototype.close = function(repository, issue) {
+  var self = this;
+  self.github.issues.edit({
+    user: repository.user,
+    repo: repository.repo,
+    number: issue.number,
+    state: 'close'
+  });
+};
+
 Accuser.prototype.addRepository = function(user, repo) {
   var self = this;
   var repository = new Repository(user, repo);
