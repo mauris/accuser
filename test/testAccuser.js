@@ -127,6 +127,44 @@ describe("Accuser", function() {
     next();
   });
 
+  it("should open an issue", function(next) {
+    var repository = accuser.addRepository("mauris", "accuser");
+    accuser.github = {
+      issues: {
+        edit: function(obj) {
+          assert(obj.repo === repository.repo);
+          assert(obj.user === repository.user);
+          assert(obj.number === sampleIssue.number);
+          assert(obj.state === 'open');
+        }
+      }
+    };
+    var mock = sinon.mock(accuser.github.issues);
+    mock.expects("edit").once();
+    accuser.open(repository, sampleIssue);
+    mock.verify();
+    next();
+  });
+
+  it("should close an issue", function(next) {
+    var repository = accuser.addRepository("mauris", "accuser");
+    accuser.github = {
+      issues: {
+        edit: function(obj) {
+          assert(obj.repo === repository.repo);
+          assert(obj.user === repository.user);
+          assert(obj.number === sampleIssue.number);
+          assert(obj.state === 'closed');
+        }
+      }
+    };
+    var mock = sinon.mock(accuser.github.issues);
+    mock.expects("edit").once();
+    accuser.open(repository, sampleIssue);
+    mock.verify();
+    next();
+  });
+
   it("should add some labels to an issue", function(next) {
     var repository = accuser.addRepository("mauris", "accuser");
     var testLabel = [
